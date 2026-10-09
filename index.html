@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Câu Trắc Nghiệm Ngữ Pháp Tiếng Anh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Hiệu ứng chọn đáp án (Radio buttons) */
+        .radio-custom {
+            accent-color: #3b82f6; /* Blue-500 */
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen pb-20">
+
+    <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold">Ôn Tập Ngữ Pháp TOEIC</h1>
+                <p class="text-sm text-blue-200">100 Câu - 10 Điểm (0.1 điểm/câu)</p>
+            </div>
+            <div id="scoreDisplayTop" class="hidden bg-white text-blue-600 font-bold px-4 py-2 rounded-full shadow-inner text-lg">
+                Điểm: <span id="topScoreValue">0</span>/10
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">Chủ điểm ôn tập:</h2>
+            <ul class="list-disc list-inside text-gray-600 mb-6 space-y-1 ml-2">
+                <li>Gerund/Infinitive (Danh động từ / Động từ nguyên mẫu)</li>
+                <li>Tenses (Các thì trong tiếng Anh)</li>
+                <li>Passive Voice (Câu bị động)</li>
+                <li>If Clause (Câu điều kiện)</li>
+                <li>Reported Speech (Câu tường thuật)</li>
+                <li>Relative Clause (Mệnh đề quan hệ)</li>
+            </ul>
+            
+            <form id="quizForm" class="space-y-8">
+                <div id="questionsContainer">
+                    <!-- Các câu hỏi sẽ được render bằng JavaScript vào đây -->
+                </div>
+
+                <div class="pt-8 border-t border-gray-200 flex flex-col items-center">
+                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition duration-300 transform hover:scale-105 text-lg">
+                        Nộp Bài
+                    </button>
+                    
+                    <div id="resultSummary" class="hidden mt-6 text-center">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">Kết Quả Của Bạn</h3>
+                        <p class="text-2xl font-semibold"><span id="finalScore" class="text-blue-600">0</span> / 10 Điểm</p>
+                        <p id="correctCount" class="text-gray-600 mt-2">Đúng 0 / 100 câu</p>
+                        <button type="button" id="retryBtn" class="mt-4 text-blue-600 hover:text-blue-800 underline font-medium">
+                            Làm lại bài thi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Dữ liệu 100 câu hỏi (trích từ file đã tạo)
+        const questionsData = [
+            // Gerund / Infinitive (1-17)
+            { id: 1, q: "The management expects the new policy _____ productivity by 15%.", opts: ["A. to increase", "B. increasing", "C. increase", "D. increased"], ans: "A" },
+            { id: 2, q: "We are considering _____ a new branch in Da Nang next year.", opts: ["A. open", "B. to open", "C. opening", "D. opened"], ans: "C" },
+            { id: 3, q: "Mr. Smith decided _____ the job offer due to the low salary.", opts: ["A. declining", "B. to decline", "C. decline", "D. declined"], ans: "B" },
+            { id: 4, q: "Please avoid _____ personal phone calls during working hours.", opts: ["A. making", "B. to make", "C. make", "D. made"], ans: "A" },
+            { id: 5, q: "The technician advised us _____ the software immediately.", opts: ["A. updating", "B. update", "C. to update", "D. updated"], ans: "C" },
+            { id: 6, q: "I look forward to _____ from you soon.", opts: ["A. hear", "B. hearing", "C. to hear", "D. heard"], ans: "B" },
+            { id: 7, q: "They plan _____ the construction project before December.", opts: ["A. finish", "B. finishing", "C. to finish", "D. finished"], ans: "C" },
+            { id: 8, q: "Do you mind _____ the door for me?", opts: ["A. to open", "B. open", "C. opening", "D. opened"], ans: "C" },
+            { id: 9, q: "We appreciate your _____ us with this important task.", opts: ["A. help", "B. to help", "C. helped", "D. helping"], ans: "D" },
+            { id: 10, q: "She refused _____ the document without consulting her lawyer.", opts: ["A. signing", "B. sign", "C. to sign", "D. signed"], ans: "C" },
+            { id: 11, q: "The company promised _____ all defective products.", opts: ["A. replace", "B. to replace", "C. replacing", "D. replaced"], ans: "B" },
+            { id: 12, q: "It is important _____ the safety guidelines at all times.", opts: ["A. to follow", "B. following", "C. follow", "D. followed"], ans: "A" },
+            { id: 13, q: "He suggested _____ the meeting until next week.", opts: ["A. postpone", "B. to postpone", "C. postponing", "D. postponed"], ans: "C" },
+            { id: 14, q: "They failed _____ the deadline because of unexpected issues.", opts: ["A. meeting", "B. to meet", "C. meet", "D. met"], ans: "B" },
+            { id: 15, q: "The manager encourages employees _____ in training programs.", opts: ["A. participate", "B. participating", "C. to participate", "D. participated"], ans: "C" },
+            { id: 16, q: "She enjoys _____ books about marketing strategies.", opts: ["A. to read", "B. read", "C. reading", "D. reads"], ans: "C" },
+            { id: 17, q: "We need _____ more staff for the upcoming holiday season.", opts: ["A. to hire", "B. hiring", "C. hire", "D. hired"], ans: "A" },
+            
+            // Tenses (18-34)
+            { id: 18, q: "By the time we arrive at the station, the train _____.", opts: ["A. has left", "B. will have left", "C. leaves", "D. left"], ans: "B" },
+            { id: 19, q: "Our company _____ its 10th anniversary next month.", opts: ["A. is celebrating", "B. celebrated", "C. celebrates", "D. has celebrated"], ans: "A" },
+            { id: 20, q: "I _____ for this corporation since 2015.", opts: ["A. am working", "B. work", "C. have been working", "D. worked"], ans: "C" },
+            { id: 21, q: "While he _____ the report, the power went out.", opts: ["A. is typing", "B. was typing", "C. types", "D. has typed"], ans: "B" },
+            { id: 22, q: "The marketing team _____ a new campaign at the moment.", opts: ["A. develops", "B. developed", "C. is developing", "D. has developed"], ans: "C" },
+            { id: 23, q: "They _____ the quarterly financial results yesterday.", opts: ["A. announce", "B. have announced", "C. will announce", "D. announced"], ans: "D" },
+            { id: 24, q: "Before the manager arrived, the staff _____ everything.", opts: ["A. prepared", "B. prepares", "C. had prepared", "D. has prepared"], ans: "C" },
+            { id: 25, q: "We usually _____ our weekly meetings on Monday mornings.", opts: ["A. hold", "B. are holding", "C. held", "D. holds"], ans: "A" },
+            { id: 26, q: "By next year, they _____ the construction of the new bridge.", opts: ["A. finish", "B. will have finished", "C. finished", "D. are finishing"], ans: "B" },
+            { id: 27, q: "Look at those dark clouds! It _____ soon.", opts: ["A. rains", "B. will rain", "C. is going to rain", "D. rained"], ans: "C" },
+            { id: 28, q: "She _____ her keys; she can't find them anywhere.", opts: ["A. loses", "B. lost", "C. has lost", "D. is losing"], ans: "C" },
+            { id: 29, q: "I _____ my boss at 3 PM tomorrow.", opts: ["A. am meeting", "B. meet", "C. met", "D. have met"], ans: "A" },
+            { id: 30, q: "The committee _____ the proposal twice this week.", opts: ["A. reviewed", "B. has reviewed", "C. is reviewing", "D. reviews"], ans: "B" },
+            { id: 31, q: "When I saw him, he _____ to a client on the phone.", opts: ["A. talks", "B. is talking", "C. was talking", "D. talked"], ans: "C" },
+            { id: 32, q: "Next month, she _____ in this city for ten years.", opts: ["A. will have lived", "B. lives", "C. has lived", "D. is living"], ans: "A" },
+            { id: 33, q: "He _____ a promotion after he completed the major project.", opts: ["A. receives", "B. is receiving", "C. received", "D. has received"], ans: "C" },
+            { id: 34, q: "Water _____ at 100 degrees Celsius.", opts: ["A. boil", "B. boils", "C. is boiling", "D. boiled"], ans: "B" },
+            
+            // Passive Voice (35-51)
+            { id: 35, q: "The final report must _____ by the end of the day.", opts: ["A. submit", "B. be submitted", "C. submitted", "D. submitting"], ans: "B" },
+            { id: 36, q: "This application was _____ by our top software engineers.", opts: ["A. developed", "B. develop", "C. developing", "D. develops"], ans: "A" },
+            { id: 37, q: "A new hospital _____ in the city center right now.", opts: ["A. is building", "B. builds", "C. is being built", "D. has built"], ans: "C" },
+            { id: 38, q: "The documents _____ to your office tomorrow morning.", opts: ["A. will deliver", "B. will be delivered", "C. deliver", "D. are delivering"], ans: "B" },
+            { id: 39, q: "All employees are required _____ uniform at the workplace.", opts: ["A. wear", "B. wearing", "C. to be worn", "D. to wear"], ans: "D" },
+            { id: 40, q: "The packages _____ before 5 PM yesterday.", opts: ["A. shipped", "B. were shipped", "C. are shipped", "D. have shipped"], ans: "B" },
+            { id: 41, q: "Many new policies _____ since the new CEO took over.", opts: ["A. introduced", "B. have introduced", "C. have been introduced", "D. are introduced"], ans: "C" },
+            { id: 42, q: "The conference room _____ when I arrived.", opts: ["A. is cleaned", "B. was being cleaned", "C. has cleaned", "D. cleaned"], ans: "B" },
+            { id: 43, q: "Customers will _____ about any changes in the schedule.", opts: ["A. inform", "B. be informed", "C. informing", "D. informed"], ans: "B" },
+            { id: 44, q: "The budget proposal _____ by the finance committee next week.", opts: ["A. will review", "B. is reviewing", "C. will be reviewed", "D. reviews"], ans: "C" },
+            { id: 45, q: "The error _____ by the IT department yesterday.", opts: ["A. fixed", "B. was fixed", "C. is fixed", "D. has fixed"], ans: "B" },
+            { id: 46, q: "These products _____ in Germany.", opts: ["A. are manufactured", "B. manufacture", "C. manufacturing", "D. manufactured"], ans: "A" },
+            { id: 47, q: "The winner of the contest _____ tomorrow.", opts: ["A. will announce", "B. is announced", "C. will be announced", "D. announced"], ans: "C" },
+            { id: 48, q: "My car _____ at the garage right now.", opts: ["A. repairs", "B. is repairing", "C. repaired", "D. is being repaired"], ans: "D" },
+            { id: 49, q: "The event _____ due to bad weather conditions.", opts: ["A. was cancelled", "B. cancelled", "C. cancels", "D. is cancelling"], ans: "A" },
+            { id: 50, q: "Instructions should _____ carefully before using the machine.", opts: ["A. read", "B. be read", "C. reading", "D. have read"], ans: "B" },
+            { id: 51, q: "The building _____ completely destroyed by the fire last year.", opts: ["A. was", "B. is", "C. has been", "D. will be"], ans: "A" },
+            
+            // If Clause (52-68)
+            { id: 52, q: "If I _____ you, I would apply for that position.", opts: ["A. am", "B. was", "C. were", "D. have been"], ans: "C" },
+            { id: 53, q: "If it rains tomorrow, we _____ the outdoor event.", opts: ["A. cancel", "B. will cancel", "C. would cancel", "D. cancelled"], ans: "B" },
+            { id: 54, q: "Had I known about the meeting, I _____ earlier.", opts: ["A. will come", "B. would come", "C. came", "D. would have come"], ans: "D" },
+            { id: 55, q: "If the client _____ the contract, we will start the project.", opts: ["A. sign", "B. signs", "C. signed", "D. had signed"], ans: "B" },
+            { id: 56, q: "I would travel around the world if I _____ a million dollars.", opts: ["A. win", "B. won", "C. will win", "D. had won"], ans: "B" },
+            { id: 57, q: "If she had studied harder, she _____ the exam.", opts: ["A. would pass", "B. will pass", "C. would have passed", "D. passed"], ans: "C" },
+            { id: 58, q: "_____ you need any assistance, please contact our support team.", opts: ["A. If", "B. Should", "C. Were", "D. Had"], ans: "B" },
+            { id: 59, q: "If the weather _____ better, we could have gone for a picnic.", opts: ["A. is", "B. was", "C. were", "D. had been"], ans: "D" },
+            { id: 60, q: "We will give you a discount if you _____ in bulk.", opts: ["A. order", "B. ordered", "C. ordering", "D. will order"], ans: "A" },
+            { id: 61, q: "If I had more time, I _____ an extra course.", opts: ["A. take", "B. will take", "C. would take", "D. would have taken"], ans: "C" },
+            { id: 62, q: "_____ I in your shoes, I wouldn't accept that offer.", opts: ["A. Am", "B. If", "C. Were", "D. Had"], ans: "C" },
+            { id: 63, q: "If he _____ his doctor's advice, he would be healthier now.", opts: ["A. followed", "B. had followed", "C. follows", "D. has followed"], ans: "B" },
+            { id: 64, q: "Unless you _____ hard, you will fail the test.", opts: ["A. try", "B. don't try", "C. tried", "D. didn't try"], ans: "A" },
+            { id: 65, q: "If the company _____ bankrupt, many people will lose their jobs.", opts: ["A. go", "B. goes", "C. went", "D. had gone"], ans: "B" },
+            { id: 66, q: "If they hadn't been late, they _____ the flight.", opts: ["A. wouldn't miss", "B. didn't miss", "C. wouldn't have missed", "D. won't miss"], ans: "C" },
+            { id: 67, q: "She could buy a new car if she _____ enough money.", opts: ["A. saves", "B. saved", "C. had saved", "D. is saving"], ans: "B" },
+            { id: 68, q: "If you heat ice, it _____.", opts: ["A. melts", "B. will melt", "C. melted", "D. would melt"], ans: "A" },
+            
+            // Reported Speech (69-84)
+            { id: 69, q: "He said that he _____ a new car the previous day.", opts: ["A. bought", "B. buys", "C. had bought", "D. has bought"], ans: "C" },
+            { id: 70, q: "The manager asked me _____ I was ready to take on the project.", opts: ["A. that", "B. whether", "C. what", "D. why"], ans: "B" },
+            { id: 71, q: "She told him _____ the documents on her desk.", opts: ["A. leave", "B. to leave", "C. leaving", "D. left"], ans: "B" },
+            { id: 72, q: "They announced that the CEO _____ the next day.", opts: ["A. will arrive", "B. would arrive", "C. arrives", "D. arrived"], ans: "B" },
+            { id: 73, q: "I wondered _____ he had left the meeting early.", opts: ["A. why", "B. that", "C. what", "D. which"], ans: "A" },
+            { id: 74, q: "She asked me where I _____ from.", opts: ["A. come", "B. am coming", "C. came", "D. will come"], ans: "C" },
+            { id: 75, q: "He promised that he _____ the task by Friday.", opts: ["A. finishes", "B. will finish", "C. would finish", "D. finished"], ans: "C" },
+            { id: 76, q: "The receptionist advised me _____ my passport.", opts: ["A. bringing", "B. to bring", "C. bring", "D. brought"], ans: "B" },
+            { id: 77, q: "She said she _____ a great time at the party then.", opts: ["A. is having", "B. was having", "C. has", "D. had"], ans: "B" },
+            { id: 78, q: "My colleague told me that the system _____ upgraded recently.", opts: ["A. was", "B. is", "C. had been", "D. has been"], ans: "C" },
+            { id: 79, q: "The teacher asked the students _____ talk during the exam.", opts: ["A. not", "B. to not", "C. don't", "D. not to"], ans: "D" },
+            { id: 80, q: "He inquired _____ I had seen the new policy memo.", opts: ["A. if", "B. that", "C. unless", "D. what"], ans: "A" },
+            { id: 81, q: "Sarah said that she _____ to Paris before.", opts: ["A. has never been", "B. had never been", "C. never was", "D. is never"], ans: "B" },
+            { id: 82, q: "The boss told us _____ hard on the new project.", opts: ["A. working", "B. work", "C. to work", "D. worked"], ans: "C" },
+            { id: 83, q: "She wanted to know _____ the train was delayed.", opts: ["A. when", "B. why", "C. what", "D. who"], ans: "B" },
+            { id: 84, q: "He said, 'I can fix it.' -> He said that he _____ fix it.", opts: ["A. can", "B. could", "C. will", "D. would"], ans: "B" },
+            
+            // Relative Clause (85-100)
+            { id: 85, q: "The man _____ is standing over there is our new director.", opts: ["A. who", "B. whom", "C. which", "D. whose"], ans: "A" },
+            { id: 86, q: "The book _____ I borrowed from the library is very interesting.", opts: ["A. who", "B. whom", "C. which", "D. whose"], ans: "C" },
+            { id: 87, q: "This is the company _____ products are sold worldwide.", opts: ["A. who", "B. which", "C. that", "D. whose"], ans: "D" },
+            { id: 88, q: "Do you know the reason _____ she resigned?", opts: ["A. when", "B. where", "C. why", "D. which"], ans: "C" },
+            { id: 89, q: "The building, _____ was constructed in 1920, is now a museum.", opts: ["A. that", "B. which", "C. where", "D. who"], ans: "B" },
+            { id: 90, q: "The candidates _____ CVs are selected will be called for an interview.", opts: ["A. who", "B. whose", "C. whom", "D. which"], ans: "B" },
+            { id: 91, q: "I visited the town _____ I grew up.", opts: ["A. which", "B. when", "C. where", "D. that"], ans: "C" },
+            { id: 92, q: "The person to _____ you should send this form is Mr. Lee.", opts: ["A. who", "B. whom", "C. which", "D. whose"], ans: "B" },
+            { id: 93, q: "She is the only employee _____ knows the password.", opts: ["A. which", "B. who", "C. whom", "D. whose"], ans: "B" },
+            { id: 94, q: "The software _____ we installed yesterday crashed.", opts: ["A. who", "B. whose", "C. whom", "D. that"], ans: "D" },
+            { id: 95, q: "I remember the day _____ we first met.", opts: ["A. where", "B. which", "C. when", "D. why"], ans: "C" },
+            { id: 96, q: "Anyone _____ is interested in the course should sign up.", opts: ["A. who", "B. which", "C. whom", "D. whose"], ans: "A" },
+            { id: 97, q: "My sister, _____ lives in New York, is a doctor.", opts: ["A. that", "B. who", "C. which", "D. whom"], ans: "B" },
+            { id: 98, q: "The laptop _____ I bought last week is already broken.", opts: ["A. who", "B. whom", "C. which", "D. whose"], ans: "C" },
+            { id: 99, q: "He is the writer _____ books have won several awards.", opts: ["A. who", "B. whom", "C. whose", "D. which"], ans: "C" },
+            { id: 100, q: "The meeting room, _____ we usually hold our discussions, is being renovated.", opts: ["A. when", "B. where", "C. which", "D. that"], ans: "B" }
+        ];
+
+        const container = document.getElementById('questionsContainer');
+        const form = document.getElementById('quizForm');
+        
+        // Render 100 câu hỏi ra HTML
+        questionsData.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'mb-6 p-4 rounded-lg bg-gray-50 border border-gray-100 question-block transition-colors duration-300';
+            questionDiv.id = `q-block-${q.id}`;
+            
+            let html = `
+                <div class="flex items-start">
+                    <span class="font-bold text-blue-600 mr-2 min-w-[40px]">Câu ${q.id}:</span>
+                    <p class="font-medium text-gray-800">${q.q}</p>
+                </div>
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 ml-[48px]">
+            `;
+
+            const letters = ['A', 'B', 'C', 'D'];
+            q.opts.forEach((opt, optIndex) => {
+                const letter = letters[optIndex];
+                html += `
+                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-100 transition duration-200">
+                        <input type="radio" name="q${q.id}" value="${letter}" class="radio-custom w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" required>
+                        <span class="text-gray-700">${opt}</span>
+                    </label>
+                `;
+            });
+
+            html += `
+                </div>
+                <div id="feedback-${q.id}" class="hidden mt-3 ml-[48px] p-3 rounded-md text-sm font-medium">
+                    <!-- Phản hồi đúng/sai sẽ hiện ở đây -->
+                </div>
+            `;
+            
+            questionDiv.innerHTML = html;
+            container.appendChild(questionDiv);
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Ngăn load lại trang
+            
+            // Hỏi xác nhận trước khi nộp
+            const confirmSubmit = window.confirm("Bạn có chắc chắn muốn nộp bài?");
+            if (!confirmSubmit) return;
+
+            let score = 0;
+            const pointsPerQuestion = 0.1;
+            const totalQuestions = questionsData.length;
+
+            questionsData.forEach(q => {
+                // Lấy đáp án người dùng chọn
+                const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
+                const feedbackDiv = document.getElementById(`feedback-${q.id}`);
+                const qBlock = document.getElementById(`q-block-${q.id}`);
+                
+                // Reset style
+                qBlock.classList.remove('bg-green-50', 'bg-red-50', 'border-green-200', 'border-red-200');
+                
+                if (selectedOption) {
+                    const userAnswer = selectedOption.value;
+                    const isCorrect = userAnswer === q.ans;
+                    
+                    if (isCorrect) {
+                        score++;
+                        feedbackDiv.className = "mt-3 ml-[48px] p-3 rounded-md text-sm font-medium bg-green-100 text-green-800 border border-green-200 block";
+                        feedbackDiv.innerHTML = `<span class="flex items-center"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Chính xác!</b> Đáp án đúng là <b>${q.ans}</b>.</span>`;
+                        qBlock.classList.add('bg-green-50', 'border-green-200');
+                    } else {
+                        feedbackDiv.className = "mt-3 ml-[48px] p-3 rounded-md text-sm font-medium bg-red-100 text-red-800 border border-red-200 block";
+                        feedbackDiv.innerHTML = `<span class="flex items-center"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> <b>Chưa đúng!</b> Bạn chọn <b>${userAnswer}</b>. Đáp án đúng là <b>${q.ans}</b>.</span>`;
+                        qBlock.classList.add('bg-red-50', 'border-red-200');
+                    }
+                }
+                
+                // Khóa không cho sửa đáp án sau khi nộp
+                const radios = document.querySelectorAll(`input[name="q${q.id}"]`);
+                radios.forEach(radio => radio.disabled = true);
+            });
+
+            // Tính toán điểm cuối cùng (làm tròn 1 chữ số thập phân)
+            const finalScoreVal = (score * pointsPerQuestion).toFixed(1);
+            
+            // Cập nhật giao diện kết quả
+            document.getElementById('finalScore').textContent = finalScoreVal;
+            document.getElementById('correctCount').textContent = `Đúng ${score} / ${totalQuestions} câu`;
+            
+            document.getElementById('topScoreValue').textContent = finalScoreVal;
+            document.getElementById('scoreDisplayTop').classList.remove('hidden');
+
+            // Ẩn nút nộp bài, hiện kết quả
+            document.getElementById('submitBtn').classList.add('hidden');
+            document.getElementById('resultSummary').classList.remove('hidden');
+
+            // Cuộn lên đầu trang để xem điểm
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        document.getElementById('retryBtn').addEventListener('click', function() {
+            // Xác nhận làm lại
+            if(window.confirm("Làm lại bài thi sẽ xóa kết quả hiện tại. Bạn có chắc không?")) {
+                // Reset form
+                form.reset();
+                
+                // Mở khóa các input
+                const allRadios = document.querySelectorAll('input[type="radio"]');
+                allRadios.forEach(radio => radio.disabled = false);
+                
+                // Ẩn các feedback và reset màu nền câu hỏi
+                questionsData.forEach(q => {
+                    const feedbackDiv = document.getElementById(`feedback-${q.id}`);
+                    feedbackDiv.classList.add('hidden');
+                    feedbackDiv.classList.remove('block');
+                    
+                    const qBlock = document.getElementById(`q-block-${q.id}`);
+                    qBlock.classList.remove('bg-green-50', 'bg-red-50', 'border-green-200', 'border-red-200');
+                });
+                
+                // Reset UI
+                document.getElementById('scoreDisplayTop').classList.add('hidden');
+                document.getElementById('submitBtn').classList.remove('hidden');
+                document.getElementById('resultSummary').classList.add('hidden');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
